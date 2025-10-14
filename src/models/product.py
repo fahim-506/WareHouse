@@ -1,8 +1,7 @@
 from sqlalchemy import Column, Integer , String, Float, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-
-Base = declarative_base()
+from config.database import Base
 
 
 #  BRAND
@@ -34,8 +33,8 @@ class Product(Base):
 
     category = relationship ("Category", back_populates="product")
     brand = relationship ("Brand", back_populates="product")
-    product_section = relationship ("ProductSection", back_populates="Product")
-    purchase = relationship ("Purchase", back_populates="product")
+    product_section = relationship ("ProductSection", back_populates="product",cascade="all, delete-orphan")
+    purchase = relationship ("Purchase", back_populates="product",cascade="all, delete-orphan")
 
 
 #PRODUCT AND RACK SECTION

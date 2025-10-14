@@ -1,8 +1,7 @@
 from sqlalchemy import Column, Integer , String, Float, ForeignKey, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-
-Base = declarative_base()
+from config.database import Base
 
 
 #SALE PERSON
@@ -12,7 +11,7 @@ class Sale_Person(Base):
     name = Column(String, nullable=False)
     contact = Column(String(10) ,nullable=False)
 
-    purchase = relationship ("Purchase", back_populates="sale_person")
+    purchase = relationship ("Purchase", back_populates="sale_person",cascade="all, delete-orphan")
 
 
 #PURCHASE

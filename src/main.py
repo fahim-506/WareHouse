@@ -1,12 +1,13 @@
-from fastapi import  FastAPI
-from src.routers.rack_apis import router
-from src import models
-from src.config.database import engine,sessionlocal
+from fastapi import FastAPI
+import uvicorn
+from routers.rack_apis import router
+from models import rack_section,product,purchase
+from config.database import engine,Base
 from sqlalchemy.orm import Session
 
 app = FastAPI()
 
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app.include_router(router)
 
