@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
-from routers.rack_apis import router
-from models import rack_section,product,purchase
+from routers.rack_apis  import router
+from models import rack_section,product,purchase 
 from config.database import engine,Base
 from sqlalchemy.orm import Session
 
