@@ -5,6 +5,8 @@ from typing import List
 class BrandBase(BaseModel):
     name : str
 
+class BrandUpdate(BrandBase):
+    pass
 
 class CategoryBase(BaseModel):
     name : str
@@ -12,7 +14,7 @@ class CategoryBase(BaseModel):
 
 class ProductBase(BaseModel):
     name : str
-    price : int
+    price : float
 
 
 class ProductSectionBase(BaseModel):

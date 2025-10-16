@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from schemas import racksection
-from models.rack_section import Rack, Section, RackSection
+from src.schemas import racksection
+from src.models.rack_section import Rack, Section, RackSection
 from typing import List, Dict
 
-
+# ================= Rack =================
 #create rack
 def Create_rack (db : Session, rack : racksection.RackBase):
     existing = db.query(Rack).filter(Rack.name == rack.name).first()
@@ -23,7 +23,11 @@ def Create_rack (db : Session, rack : racksection.RackBase):
 
 #read rack
 def get_rack(db : Session):
-    return db.query(Rack).all()
+    results = db.query(Rack).all()
+    # data = [item.name for item in results] 
+    # print("results : ", data)
+    return results
+    
 
 # read rack by id
 def get_rack_by(db : Session, rack_id : int ):
@@ -57,7 +61,7 @@ def delete_rack(db : Session, rack_id : int ):
     return False
 
 
-
+# ================= Section =================
 # #Create Section
 def Create_section(rack_id : int ,db: Session, section : racksection.SectionBase):
     db_rack = db.query(Rack).filter(Rack.id == rack_id).first()
@@ -84,3 +88,36 @@ def Create_section(rack_id : int ,db: Session, section : racksection.SectionBase
     except Exception as e:
         db.rollback()
         raise HTTPException (status_code = 500 , detail= f"Failed to create Section : {str(e)}")
+
+
+#read Section
+def get_section(db : Session):
+    return db.query(Section).all()
+
+# read section by id
+def get_section_by(db : Session, section_id : int ):
+    db_section_id = db.query(Section).filter(Section.id == section_id).first()
+    if not db_section_id:
+        raise HTTPException(status_code=400, detail="section not found")
+    return db_section_id
+
+
+#update Section
+def update_section_name(db : Section, section_id : int ,section_update : racksection.SectionBase):
+    db_name = db.query(Section).filter(Section.id == section_id).first()
+    if not db_name:
+        return None
+    db_name.name = section_update.name
+    db.commit()
+    db.refresh(db_name)
+    return db_name
+
+
+# delete section 
+def delete_section(db : Session, section_id : int ):
+    db_section = db.query(Section).filter(Section.id == section_id).first()
+    if db_section:
+        db.delete(db_section)
+        db.commit()
+        return True
+    return False

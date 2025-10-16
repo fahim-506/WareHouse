@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response , Depends, HTTPException
-from config.database import get_db
-from schemas.purchase import SalePersonBase
-from services import person_purchase
+from src.config.database import get_db
+from src.schemas.purchase import SalePersonBase
+from src.services import person_purchase
 from sqlalchemy.orm import Session
 from typing import List
 

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer , String, Float, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from config.database import Base
+from src.config.database import Base
 
 
 #  BRAND

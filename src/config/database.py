@@ -2,7 +2,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker,declarative_base
 from dotenv import load_dotenv
-from config.settings import settings
+from src.config.settings import settings
 from sqlalchemy.ext.declarative import declarative_base
 
 load_dotenv()

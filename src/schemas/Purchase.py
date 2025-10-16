@@ -1,12 +1,13 @@
-from pydantic import BaseModel,Date,Field
+from pydantic import BaseModel,Field
 from typing import List
+from datetime import date
 
 
 
 class SalePersonBase(BaseModel):
     name : str
-    contact : int = Field(...,  max_length=10)
+    contact : int
 
 
 class PurchaseBase(BaseModel):
-    date : Date
+    Date : date
