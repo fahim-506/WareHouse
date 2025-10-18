@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from src.schemas import product
 from src.models.product import Brand,Category,Product,ProductSection
+from src.models.rack_section import RackSection
 from typing import List, Dict
 
 # ================= Brand =================
@@ -65,7 +66,7 @@ def Delete_brand(db : Session, brand_id : int ):
 def Create_Category(db : Session, category : product.CategoryBase):
     existing = db.query(Category).filter(Category.name == category.name).first()
     if existing: 
-        raise HTTPException(status_code=40, detail="This category name is already exists")
+        raise HTTPException(status_code=400, detail="This category name is already exists")
     db_category = Category(name= category.name)
     try:
         db.add(db_category)
@@ -130,14 +131,104 @@ def create_product(brand_id: int, category_id: int, db: Session, product: produc
             raise HTTPException(status_code = 400, detail = " This Product name is already exists")
         
         try:
-            db_product = Product(name = product.name, category_id = db_category.id,brand_id = db_brand.id, price = product.price)
+            db_product = Product(name = product.name, category_id = db_category.id, brand_id = db_brand.id, price = product.price)
             db.add(db_product)
             db.commit()
             db.refresh(db_product)
             return db_product
         except Exception as e:
             db.rollback()
-            return HTTPException(status_code = 500 , detail= f"Failed to create Product : {str(e)}")
+            raise HTTPException(status_code = 500 , detail= f"Failed to create Product : {str(e)}")
     except Exception as e:
          print(f" not founded: {str(e)}")
          raise e
+
+# get all product
+def get_all_product(db: Session):
+    try:
+        return db.query(Product).all()
+    except Exception as e:
+        return HTTPException(status_code=500, detail="error:" f" Failed to Get all product : {str(e)}")
+    
+
+# get product by id 
+def get_product_by_id(db: Session, product_id :int):
+    try:
+        
+        
+        db_product_id = db.query(Product).filter(Product.id == product_id).first()
+        if not db_product_id:
+            return HTTPException(status_code=400, detail="Product not found")
+        return db_product_id
+    except Exception as e :
+        return HTTPException(status_code=500 ,detail="error : "f" Failed to get product by id :{str(e)}")
+
+
+# update product
+def update_product(db:Session,product_id :int , product_update : str):
+    try:
+        db_product = db.query(Product).filter(Product.id == product_id).first()
+        if not db_product:
+            return HTTPException(404 ,detail=" product not found")
+        db_product.name = product_update
+        db.commit()
+        db.refresh(db_product)
+        return db_product
+    except Exception as e :
+        return HTTPException(500 , detail="error : "f" Failed to update product : {str(e)}")
+    
+
+#Delete product
+def delete_product(product_id : int, db: Session):
+    try:
+        db.query(Product).filter(Product.id == product_id).delete()
+        db.commit()
+    except Exception as e:
+        print(f"Error in Delete product: {str(e)}")
+        raise e
+
+
+# ================= Product Section =================
+
+# Create Product Section
+def create_product_section(product_id : int, rack_section_id : int , product_section: ProductSection, db:Session):
+    try:
+        db_product = db.query(Product).filter(Product.id == product_id).first()
+        if not db_product:
+            raise HTTPException(status_code=400, detail="produc not found")
+        db_rack_section = db.query(RackSection).filter(RackSection.id == rack_section_id).first()
+        if not db_rack_section:
+            raise HTTPException(status_code=400 , detail="Rack Section not found")
+        try:
+            db_product_section = ProductSection(product_id= db_product.id , racksection_id = db_rack_section.id ,quantity = product_section.quantity)
+            db.add(db_product_section)
+            db.commit()
+            db.refresh(db_product_section)
+            return db_product_section
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code = 500 , detail= f"Failed to create Product Section : {str(e)}")
+    except Exception as e:
+         print(f" not founded: {str(e)}")
+         raise e
+
+#get all product section
+def get_product_section(db:Session):
+    try:
+        return db.query(ProductSection).all()
+    except Exception as e:
+        return HTTPException(500, detail="error: "f"Failed to get all product section {str(e)}")
+
+
+#get product section by id 
+def get_product_section_by_id(db:Session,id:int):
+    try:
+        product_section= db.query(ProductSection).filter(ProductSection.id == id).first()
+        if not product_section:
+            raise HTTPException(400,detail="Product section not found")
+        return product_section
+    except Exception as e :
+        raise HTTPException(500 ,detail=f"Failed to get product section by if  {str(e)}")
+    
+
+#update product section

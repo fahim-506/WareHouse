@@ -58,7 +58,7 @@ def delete_rack(rack_id : int , db : Session = Depends(get_db)):
 def Create_Section(rack_id : int ,sections : SectionBase, db : Session = Depends(get_db)):
     return rack.Create_section(rack_id ,db,sections)
 
-
+# get all section 
 @router.get("/section",response_model =List[SectionBase])
 def read_rack(db: Session = Depends(get_db)):
     return rack.get_section(db)

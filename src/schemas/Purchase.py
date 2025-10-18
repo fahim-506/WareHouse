@@ -4,10 +4,14 @@ from datetime import date
 
 
 
-class SalePersonBase(BaseModel):
+class   SalePersonBase(BaseModel):
     name : str
-    contact : int
+    contact : str
+    class Config:
+        orm_mode = True
 
 
 class PurchaseBase(BaseModel):
     Date : date
+    class Config:
+        orm_mode = True
