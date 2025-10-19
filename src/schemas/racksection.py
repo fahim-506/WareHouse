@@ -14,10 +14,10 @@ class SectionBase(BaseModel):
         orm_mode = True
 
 
-class RackSectionBase(BaseModel):
-    id : int
-    rack : RackBase
-    section : SectionBase
+# class RackSectionBase(BaseModel):
+#     id : int
+#     rack : RackBase
+#     section : SectionBase
 
-    class Config:
-        orm_mode = True
+#     class Config:
+#         orm_mode = True

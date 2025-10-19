@@ -40,7 +40,7 @@ def Get_brand_id(brand_id : int , db : Session):
 def Update_brand(db : Session, brand_id : int , brand_update : str):
     db_brand = db.query(Brand).filter(Brand.id == brand_id).first()
     if not db_brand:
-        return None
+        return HTTPException(400,detail= "Brand not found")
     print(f"db brand : {db_brand}")
     print(f"db name : {db_brand.name}")
     print(f"brand_update : {brand_update}")
@@ -95,7 +95,7 @@ def Get_category_id(category_id : int , db : Session):
 def Update_category(db : Session, category_id : int , category_update : str):
     db_category = db.query(Category).filter(Category.id == category_id).first()
     if not db_category:
-        return None
+        return HTTPException(status_code=400, detail=" Category not found")
     print(f"db brand : {db_category}")
     db_category.name = category_update
     db.commit()
@@ -232,3 +232,25 @@ def get_product_section_by_id(db:Session,id:int):
     
 
 #update product section
+def update_product_section(db:Session,id: int, product_section: int):
+    try:
+        db_id = db.query(ProductSection).filter(ProductSection.id == id).first()
+        if not db_id:
+            raise HTTPException(400 , detail ="Product section not found")
+        db_id.quantity = product_section
+        db.commit()
+        db.refresh(db_id)
+        return db_id
+    except Exception as e:
+        raise HTTPException(500,detail=f"Failed to update product section  {str(e)}")
+    
+#delete product section
+def delete_product_section(product_section: int,db:Session):
+    try:
+        db_product_section = db.query(ProductSection).filter(ProductSection.id == product_section).first()
+        if not db_product_section:
+            raise HTTPException(404,detail= "product section not found")
+        db.delete(db_product_section)
+        db.commit()
+    except Exception as e:
+        raise HTTPException(500,detail=f"Failed to deleting product section {str(e)}")

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List
-from src.schemas.racksection import RackSectionBase
+# from src.schemas.racksection import RackSectionBase
 
 class BrandBase(BaseModel):
     name : str
@@ -25,8 +25,12 @@ class ProductBase(BaseModel):
 
 class ProductSectionBase(BaseModel):
     quantity : int
-    product: ProductBase
-    racksection: RackSectionBase
+
 
     class Config:
         orm_mode = True
+
+
+
+    # product: ProductBase
+    # racksection: RackSectionBase

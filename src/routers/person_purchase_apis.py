@@ -8,6 +8,8 @@ from typing import List
 
 router = APIRouter()
 
+# ================= Sale Person =================
+
 #create sale person
 @router.post("/sale_person",response_model=SalePersonBase)
 def Create_Saleperson(persons : SalePersonBase, db: Session = Depends(get_db)):
@@ -41,3 +43,7 @@ def delete_person(person_id : int ,db :Session=Depends(get_db),):
         return JSONResponse({"message": "delete sucessfully"}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=404,detail="error :" f"Error in deleting: {str(e)}")
+
+
+# ================= Purchase =================
+

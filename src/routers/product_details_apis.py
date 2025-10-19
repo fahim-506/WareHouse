@@ -109,7 +109,7 @@ def get_product_by_id(product_id : int , db : Session = Depends(get_db)):
         return HTTPException(400, detail={"error": f"Error in get product by id {str(e)}"})
 
 # update product 
-@router.put("/product{product_id}",response_model=ProductBase)
+@router.put("/product/{product_id}",response_model=ProductBase)
 def update_product(product_id : int, product: ProductBase, db : Session = Depends(get_db)):
     try:
         db_product = product_details.update_product(db,product_id,product.name)
@@ -156,4 +156,25 @@ def get_product_section_by_id(id : int ,db:Session=Depends(get_db)):
         return product_details.get_product_section_by_id(db,id)
     except Exception as e:
         return HTTPException (500 ,detail={"error ": f"Error in get product section by id {str(e)}"})
-                              
+
+
+#update product section
+@router.put("/product_section/{id}",response_model=ProductSectionBase)
+def update_product_section(id: int , product_section : ProductSectionBase, db : Session = Depends(get_db)):
+    try:
+        db_product_section = product_details.update_product_section(db, id, product_section.quantity)
+        if not db_product_section:
+            raise HTTPException(400,detail="product section not found")
+        return db_product_section
+    except Exception as e:
+        raise HTTPException(500, detail={"error ": f"Error in update product section {str(e)}"})
+    
+
+#delete product section
+@router.delete("/product_section/{id}")
+def delete_product_section(id: int,db: Session=Depends(get_db)):
+    try:
+        product_details.delete_product_section(id,db)
+        return JSONResponse({"message": "delete sucessfully"}, status_code=200)
+    except Exception as e:
+        return HTTPException(status_code=500,detail="error :" f"Error in deleting: {str(e)}")
