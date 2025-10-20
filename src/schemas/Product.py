@@ -25,6 +25,8 @@ class ProductBase(BaseModel):
 
 class ProductSectionBase(BaseModel):
     quantity : int
+    # product: ProductBase
+    # racksection: RackSectionBase
 
 
     class Config:
@@ -32,5 +34,3 @@ class ProductSectionBase(BaseModel):
 
 
 
-    # product: ProductBase
-    # racksection: RackSectionBase

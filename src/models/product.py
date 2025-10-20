@@ -47,3 +47,4 @@ class ProductSection(Base):
 
     product = relationship ("Product", back_populates="product_section")
     racksection = relationship ("RackSection", back_populates="product_section")
+    purchase = relationship ("Purchase", back_populates="product_section",cascade="all, delete-orphan")

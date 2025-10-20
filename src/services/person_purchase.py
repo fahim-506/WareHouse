@@ -1,19 +1,21 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from src.schemas import purchase
-from src.models.purchase import Sale_Person
+from src.schemas.purchase import SalePersonBase,PurchaseBase,PurchaseCreate
+from src.models.purchase import Sale_Person,Purchase
+from src.models.product import Product,ProductSection
 from typing import List, Dict
 
 
 # ================= Sale Person =================
 
 #create sale person
-def Create_Saleperson(db : Session , person : purchase.SalePersonBase):
+def Create_Saleperson(db : Session , person : SalePersonBase):
 
-    existing = db.query(Sale_Person).filter((Sale_Person.contact==person.contact) & (Sale_Person.name==person.name)).first()
+    # existing = db.query(Sale_Person).filter((Sale_Person.contact==person.contact) & (Sale_Person.name==person.name)).first()
+    existing =db.query(Sale_Person).filter(Sale_Person.contact == person.contact).first()
     print(f"Existing: {existing}")
     if existing:
-        return HTTPException(status_code=400, detail="This Sale person already exists")
+        raise HTTPException(status_code=400, detail="This Sale person already exists")
     if len(str(person.contact)) == 10:
         db_saleperson = Sale_Person(name = person.name , contact = person.contact)
         try:
@@ -48,16 +50,21 @@ def get_sale_person_by_id(sale_person : int ,db : Session):
     
 
 #update sale person
-def update_person(person_id : int, person: str, db : Session):
+def update_person(person_id : int, person: str,person_contact:str, db : Session):
     try:
         db_person = db.query(Sale_Person).filter(Sale_Person.id == person_id).first()
         if not db_person:
             raise HTTPException(status_code=400, detail="sale person not found")
+
         db_person.name = person
-        db_person.price = person
-        db.commit()
-        db.refresh(db_person)
-        return db_person
+        db_person.contact = person_contact
+        if len(db_person.contact)==10:
+
+            db.commit()
+            db.refresh(db_person)
+            return db_person
+        else:
+            raise HTTPException(status_code =400, detail="please enter valid number")
     except Exception as e:
         raise HTTPException(status_code=500, detail="error : "f"Failed to update sale person: {str(e)}")
     
@@ -65,10 +72,53 @@ def update_person(person_id : int, person: str, db : Session):
 #Delete sale person
 def delete_person(person_id : int , db: Session):
     try:
-        db.query(Sale_Person).filter(Sale_Person.id == person_id).delete()
+        db_person=db.query(Sale_Person).filter(Sale_Person.id == person_id).first()
+        if not db_person:
+            raise HTTPException(404,detail="person not found")
         db.commit()
     except Exception as e:
         print(f"Error in Delete sale person: {str(e)}")
         raise e
 
 
+# ================= Purchase =================
+def create_purchase(person : int, product : int , product_section : int ,purchase : PurchaseCreate,db : Session):
+    try:
+        db_person = db.query(Sale_Person).filter(Sale_Person.id == person).first()
+        if not db_person:
+            raise HTTPException(404, detail= "Sale Person not found")
+        db_product = db.query(Product).filter(Product.id == product).first()
+        if not db_product:
+            raise HTTPException(404,detail= "Product not found")
+        db_product_section = db.query(ProductSection).filter(ProductSection.id == product_section).first()
+        if not db_product_section:
+            raise HTTPException(404,detail= "Product Section not found")
+        #create purchase
+        db_purchase = Purchase(sale_person_id = db_person.id , product_id = db_product.id,
+                                   product_section_id= db_product_section.id, quantity = purchase.quantity,date = purchase.date)
+        if db_product_section.quantity < db_purchase.quantity:
+            raise HTTPException(400 ,detail=f"Only {db_product_section.quantity} items are availabe")
+            #Update quantity
+        db_product_section.quantity -= purchase.quantity
+        db.commit()
+        db.refresh(db_product_section)
+            #calculate price
+        total_price = db_product.price * purchase.quantity
+            
+
+        db.add(db_purchase)
+        db.commit()
+        db.refresh(db_purchase) 
+        return {"person_name": db_person.name,"product_name": db_product.name,
+                "quantity": db_purchase.quantity, "date":db_purchase.date, "total_price":total_price,"product_section":db_product_section.racksection_id}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException (500, detail = f"Failed to create Purchase : {str(e)}")
+
+
+#Get all purchase
+def get_purchase(db:Session):
+    try:
+        return db.query(Purchase).all()
+    except Exception as e:
+        return HTTPException(status_code=500, detail="error: "f"Failed to get all purchase : {str(e)}")

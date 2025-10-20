@@ -20,10 +20,13 @@ class Purchase(Base):
     id = Column(Integer, primary_key=True, index=True)
     sale_person_id = Column (Integer,ForeignKey("sale_person.id"))
     product_id = Column (Integer,ForeignKey("product.id"))
-    racksection_id = Column (Integer,ForeignKey("racksection.id"))
+    product_section_id = Column (Integer,ForeignKey("product_section.id"))
     quantity = Column (Integer,nullable=False)
     date = Column (Date,nullable=False)
 
     sale_person = relationship("Sale_Person", back_populates="purchase")
     product = relationship ("Product", back_populates="purchase")
-    racksection = relationship ("RackSection" , back_populates="purchase")
+    product_section = relationship ("ProductSection" , back_populates="purchase")
+
+    # Not stored in DB; calculated dynamically
+    total_price = None
