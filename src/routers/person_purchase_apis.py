@@ -65,3 +65,20 @@ def get_purchase(db : Session = Depends(get_db)):
 @router.get("/purchase/{id}",response_model=Purchases)
 def get_purchase_id(purchase : int , db:Session=Depends(get_db)):
     return person_purchase.get_purchase_id(purchase,db)
+
+
+#Update purchase
+@router.put("/purchase/{id}",response_model=PurchaseBase)
+def update_purchase(purchase_id : int,purchase:PurchaseCreate,db:Session=Depends(get_db)):
+    return person_purchase.update_purchase(purchase_id,purchase,db)
+
+#delete purchase
+@router.delete("/purchase/{id}")
+def delete_purchase(id : int , db: Session = Depends(get_db)):
+    try:
+        person_purchase.delete_purchase(id,db)
+        return JSONResponse({"message": "delete sucessfully"}, status_code=200)
+    except Exception as e:
+        raise HTTPException(status_code=500,detail="error :" f"Error in deleting: {str(e)}")
+    
+

@@ -132,3 +132,46 @@ def get_purchase_id(purchase : int, db: Session):
         return db_purchase
     except Exception as e:
         raise HTTPException(500,detail="error: "f"Failed to get purchase by id : {str(e)}")
+    
+
+#Update purchase
+def update_purchase(purchase_id : int , purchase : PurchaseCreate, db:Session):
+    try:
+        db_purchase = db.query(Purchase).filter(Purchase.id == purchase_id).first()
+        productsection=db.query(ProductSection).filter(ProductSection.id == db_purchase.product_section_id).first()
+        if not db_purchase:
+            raise HTTPException(404,detail="purchase not found")
+        db_purchase.quantity=purchase.quantity
+        db_purchase.date=purchase.date
+
+        db_person=db_purchase.sale_person
+        db_product=db_purchase.product
+        if productsection.quantity < db_purchase.quantity:
+            raise HTTPException(400 ,detail=f"Only {productsection.quantity} items are availabe")
+        productsection.quantity -= purchase.quantity
+        db.commit()
+        db.refresh(productsection)
+
+        total_price =db_purchase.quantity * db_product.price
+
+
+        db.commit()
+        db.refresh(db_purchase)
+
+
+        return {"person_name":db_person.name,"product_name":db_product.name,"quantity":db_purchase.quantity,
+                "date":db_purchase.date,"total_price":total_price,"product_section":productsection.racksection_id}
+    
+    except Exception as e:
+        raise HTTPException(500,detail="error: "f"Failed to update purchase : {str(e)}")
+
+
+#delete purchase
+def delete_purchase(id : int ,db:Session):
+    purchase= db.query(Purchase).filter(Purchase.id == id).first()
+    if not purchase:
+        raise HTTPException(404,detail="purchase not found")
+    db.delete(purchase)
+    db.commit()
+    return {"message":"Purchase deleted"}
+        
