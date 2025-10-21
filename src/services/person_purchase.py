@@ -122,3 +122,13 @@ def get_purchase(db:Session):
         return db.query(Purchase).all()
     except Exception as e:
         return HTTPException(status_code=500, detail="error: "f"Failed to get all purchase : {str(e)}")
+    
+#get purchase by id 
+def get_purchase_id(purchase : int, db: Session):
+    try:
+        db_purchase =db.query(Purchase).filter(Purchase.id == purchase).first()
+        if not db_purchase:
+            raise HTTPException(404,detail="purchase not found")
+        return db_purchase
+    except Exception as e:
+        raise HTTPException(500,detail="error: "f"Failed to get purchase by id : {str(e)}")

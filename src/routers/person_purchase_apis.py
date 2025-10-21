@@ -60,3 +60,8 @@ def create_purchase(person : str, product : str , product_section : int ,purchas
 @router.get("/purchase",response_model=List[Purchases])
 def get_purchase(db : Session = Depends(get_db)):
     return person_purchase.get_purchase(db)
+
+#get purchase by id 
+@router.get("/purchase/{id}",response_model=Purchases)
+def get_purchase_id(purchase : int , db:Session=Depends(get_db)):
+    return person_purchase.get_purchase_id(purchase,db)
